@@ -1,0 +1,33 @@
+<!-- mock-runner.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mock Runner</title>
+  <script src="https://unpkg.com/mockjs/dist/mock.js"></script>
+</head>
+<body>
+  <div>Mock Runner</div>
+  <script>
+    window.addEventListener('message', (event) => {
+      const { data } = event;
+      if (!data || !data.type || data.type !== 'mock-request') return;
+
+      try {
+        const result = Mock.mock(data.template);
+        event.source.postMessage({
+          type: data.responseType || 'mock-response',
+          id: data.id,
+          result
+        }, event.origin);
+      } catch (error) {
+        event.source.postMessage({
+          type: 'mock-response',
+          id: data.id,
+          error: error.message
+        }, event.origin);
+      }
+    });
+  </script>
+</body>
+</html>
